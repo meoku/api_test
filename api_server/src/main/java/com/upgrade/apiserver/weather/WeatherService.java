@@ -1,13 +1,11 @@
 package com.upgrade.apiserver.weather;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.net.http.HttpResponse;
-
-
 public interface WeatherService {
 
-    HttpResponse getWeatherData();
+    /*
+     * @param lat : 예보 지점 X 좌표
+     * @param lon : 예보 지점 y 좌표
+     * */
+    String getWeatherDataToAPI(String lat, String lon);
 
 }
