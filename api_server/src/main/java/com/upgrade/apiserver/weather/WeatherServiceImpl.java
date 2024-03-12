@@ -13,12 +13,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.text.DateFormat;
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.time.*;
-import java.util.Calendar;
-import java.util.Date;
 
 import static java.net.http.HttpClient.*;
 
@@ -32,8 +28,6 @@ public class WeatherServiceImpl implements WeatherService {
     String lang = "kr";
     String units = "metric";
 
-
-    // TODO :: 배치로 구현하기 (09:00 ~ 20:00)
     @Override
     public void getWeatherDataToAPI(String lat, String lon) {
 
@@ -51,6 +45,7 @@ public class WeatherServiceImpl implements WeatherService {
         }
     }
 
+    // TODO :: 파싱한 데이터 DB에 넣기
     @Override
     public void addWeatherDataInDB(@RequestBody String jsonString) {
         JSONParser jsonParser = new JSONParser();
@@ -87,8 +82,6 @@ public class WeatherServiceImpl implements WeatherService {
             for (int i = 0; i < dailyArray.size(); i++) {
                 daily = (JSONObject) dailyArray.get(i);
                 dt = daily.get("dt");
-                System.out.println(dt.equals(millis));
-
                 if (dt.equals(millis)) {
                     dailyTemp = (JSONObject) daily.get("temp");
                     minTemp = dailyTemp.get("min");

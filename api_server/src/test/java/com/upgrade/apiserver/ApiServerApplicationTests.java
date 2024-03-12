@@ -71,7 +71,7 @@ class ApiServerApplicationTests {
         JSONObject dailyTemp = new JSONObject();
         dailyTemp.put("min", 5.82);
         dailyTemp.put("max", 12.02);
-        dailyData.put("dt", 1709607600);
+        dailyData.put("dt", 1710212400);
         dailyData.put("temp", dailyTemp);
 
         dailyArray.add(0, dailyData);

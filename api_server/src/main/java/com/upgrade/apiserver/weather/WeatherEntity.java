@@ -1,9 +1,6 @@
 package com.upgrade.apiserver.weather;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -12,10 +9,11 @@ import lombok.ToString;
 @Setter
 @ToString
 @Entity
+@Table(name = "weather_info")
 public class WeatherEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long weatherId;
+    private Long datetime;
 
     private String temp;
     private Float uvi;
