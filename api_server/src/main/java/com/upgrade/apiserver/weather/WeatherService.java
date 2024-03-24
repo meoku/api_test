@@ -14,4 +14,6 @@ public interface WeatherService {
     void getWeatherDataToAPI(String lat, String lon);
 
     void addWeatherDataInDB(@RequestBody String dto);
+
+    void getWeatherDataForPage();
 }
