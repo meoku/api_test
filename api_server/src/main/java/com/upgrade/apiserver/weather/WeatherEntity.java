@@ -31,6 +31,9 @@ public class WeatherEntity {
     @Column(name = "weather")
     private String weather;
 
+    @Column(name = "weather_id")
+    private String weatherId;
+
     @Column(name = "min_temp")
     private String minTemp;
 

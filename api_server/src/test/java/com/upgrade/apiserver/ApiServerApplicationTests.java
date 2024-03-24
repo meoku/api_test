@@ -93,9 +93,5 @@ class ApiServerApplicationTests {
 
     }
 
-//    @DisplayName("GET DB DATA")
-//    @Test
-//    void testGetDBData() {
-//        weatherEntity.getUvi();
-//    }
+
 }

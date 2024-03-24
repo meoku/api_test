@@ -1,5 +1,7 @@
 package com.upgrade.apiserver.weather;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sun.tools.jconsole.JConsoleContext;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
@@ -17,6 +19,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.text.MessageFormat;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+import java.util.List;
 
 import static java.net.http.HttpClient.*;
 
@@ -85,6 +90,7 @@ public class WeatherServiceImpl implements WeatherService {
             Object description = weather.get("description");
             Object temp = current.get("temp");
             Object uvi = current.get("uvi");
+            Object weatherId = weather.get("id");
 
             JSONObject dailyData = (JSONObject) jsonParser.parse(jsonData.toJSONString());
             JSONArray dailyArray = (JSONArray) dailyData.get("daily");
@@ -111,6 +117,8 @@ public class WeatherServiceImpl implements WeatherService {
             entity.setMinTemp(minTemp.toString());
             entity.setMaxTemp(maxTemp.toString());
             entity.setDatetime(workTime);
+            entity.setWeatherId(weatherId.toString());
+
             weatherRepository.save(entity);
 
         } catch (ParseException e) {
@@ -121,18 +129,25 @@ public class WeatherServiceImpl implements WeatherService {
     }
 
 
-    //    날짜 & 시간을 PARAMETER로 받아서 출력
+    // 날짜 & 시간을 PARAMETER로 받아서 출력
     // 위치는 어디서 출력할것인지
+    // 데이터에서 날씨값을 구분할수 있는 코드를 줘야하지않나?
     @Override
-    public void getWeatherDataForPage() {
+    public String getWeatherDataForPage(String currentTime) {
         try {
+            DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+            LocalDateTime current = LocalDateTime.parse(currentTime, formatter);
 
-//            TODO 2 :: DB에 있는 값을 가져와서 데이터를 어떻게 뿌려줄건지 고민해 봐야할듯
-            System.out.println(weatherRepository.findAll());
-
+            ObjectMapper objectMapper = new ObjectMapper();
+            Collection weatherData = weatherRepository.findClosestByDatetime(current);
+            if (weatherData.size() > 0) {
+                return objectMapper.registerModule(new JavaTimeModule()).writeValueAsString(weatherData);
+            } else {
+                return "0";
+            }
         } catch (Exception e) {
-            log.error("error log = {}", e.toString());
+            log.error("데이터를 가져오는 중에 문제가 발생하였습니다. = {}", e.toString());
+            return "";
         }
-
     }
 }

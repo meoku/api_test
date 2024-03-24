@@ -1,9 +1,7 @@
 package com.upgrade.apiserver.weather;
 
-import org.json.simple.parser.ParseException;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.json.simple.JSONObject;
 
-import java.io.IOException;
 
 public interface WeatherService {
 
@@ -13,5 +11,5 @@ public interface WeatherService {
      * */
     Boolean getWeatherDataToAPI(String lat, String lon);
 
-    void getWeatherDataForPage();
+    String getWeatherDataForPage(String currentTime);
 }
