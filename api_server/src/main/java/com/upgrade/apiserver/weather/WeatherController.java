@@ -37,4 +37,10 @@ public class WeatherController {
         return "OK";
     }
 
+    @GetMapping("/api/weather-data")
+    public String getWeaterDataforPage() {
+        weatherService.getWeatherDataForPage();
+        return "OK";
+    }
+
 }
