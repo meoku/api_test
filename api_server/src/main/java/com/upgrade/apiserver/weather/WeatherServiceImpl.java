@@ -129,9 +129,7 @@ public class WeatherServiceImpl implements WeatherService {
     }
 
 
-    // 날짜 & 시간을 PARAMETER로 받아서 출력
-    // 위치는 어디서 출력할것인지
-    // 데이터에서 날씨값을 구분할수 있는 코드를 줘야하지않나?
+    // TODO :: 지역 (좌표 -> 도로명 주소) 기능 추가하기
     @Override
     public String getWeatherDataForPage(String currentTime) {
         try {
