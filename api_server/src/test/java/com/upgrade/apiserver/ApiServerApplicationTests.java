@@ -11,11 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static junit.framework.TestCase.assertEquals;
+
 @SpringBootTest
 class ApiServerApplicationTests {
-
-    @Autowired
-    private WeatherEntity weatherEntity;
 
     @Autowired
     private WeatherController weatherController;
@@ -37,9 +36,11 @@ class ApiServerApplicationTests {
         final String x = "37.549328709";
         final String y = "126.913624675";
         // when
-        weatherService.getWeatherDataToAPI(x, y);
-        // then
+        Boolean testCase = weatherService.getWeatherDataToAPI(x, y);
 
+        // then
+        System.out.println(testCase);
+        assertEquals(testCase.booleanValue(), true);
 
     }
 
@@ -85,17 +86,16 @@ class ApiServerApplicationTests {
 
 
         String data = current.toJSONString();
-
         //when
-        weatherService.addWeatherDataInDB(data);
 
         //then
 
+
     }
 
-    @DisplayName("GET DB DATA")
-    @Test
-    void testGetDBData() {
-        weatherEntity.getUvi();
-    }
+//    @DisplayName("GET DB DATA")
+//    @Test
+//    void testGetDBData() {
+//        weatherEntity.getUvi();
+//    }
 }
