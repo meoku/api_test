@@ -1,6 +1,7 @@
 package com.upgrade.apiserver;
 
 import com.upgrade.apiserver.weather.WeatherController;
+import com.upgrade.apiserver.weather.WeatherEntity;
 import com.upgrade.apiserver.weather.WeatherService;
 import org.json.JSONString;
 import org.json.simple.JSONArray;
@@ -12,6 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class ApiServerApplicationTests {
+
+    @Autowired
+    private WeatherEntity weatherEntity;
 
     @Autowired
     private WeatherController weatherController;
@@ -87,5 +91,11 @@ class ApiServerApplicationTests {
 
         //then
 
+    }
+
+    @DisplayName("GET DB DATA")
+    @Test
+    void testGetDBData() {
+        weatherEntity.getUvi();
     }
 }
