@@ -1,6 +1,5 @@
 package com.upgrade.apiserver.weather;
 
-import org.json.simple.JSONObject;
 
 
 public interface WeatherService {

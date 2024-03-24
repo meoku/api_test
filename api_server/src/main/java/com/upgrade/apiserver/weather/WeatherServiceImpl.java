@@ -2,7 +2,6 @@ package com.upgrade.apiserver.weather;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.sun.tools.jconsole.JConsoleContext;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -21,7 +20,6 @@ import java.text.MessageFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
-import java.util.List;
 
 import static java.net.http.HttpClient.*;
 
@@ -51,7 +49,7 @@ public class WeatherServiceImpl implements WeatherService {
         final String url = MessageFormat.format("https://api.openweathermap.org/data/3.0/onecall?lat={0}&lon={1}&appid={2}&lang={3}&units={4}", lat, lon, appId, lang, units);
         HttpClient client = newHttpClient();
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).build();
-        HttpResponse<String> response = null;
+        HttpResponse<String> response;
         try {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response != null && response.statusCode() == 200) {
@@ -62,7 +60,7 @@ public class WeatherServiceImpl implements WeatherService {
                 return false;
             }
         } catch (Exception e) {
-            log.error("DB에 저장하는 동안 버그가 발생하였습니다.", e.toString());
+            log.error("DB에 저장하는 동안 버그가 발생하였습니다. = {}", e.toString());
             return false;
         }
 
@@ -97,7 +95,7 @@ public class WeatherServiceImpl implements WeatherService {
             JSONObject daily;
             JSONObject dailyTemp;
 
-            Object dt = 0;
+            Object dt;
             Object maxTemp = 0.0;
             Object minTemp = 0.0;
 

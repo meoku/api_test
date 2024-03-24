@@ -1,9 +1,7 @@
 package com.upgrade.apiserver;
 
 import com.upgrade.apiserver.weather.WeatherController;
-import com.upgrade.apiserver.weather.WeatherEntity;
 import com.upgrade.apiserver.weather.WeatherService;
-import org.json.JSONString;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.junit.jupiter.api.DisplayName;
@@ -84,8 +82,6 @@ class ApiServerApplicationTests {
         daily.put("daily", dailyArray);
         current.put("daily", dailyArray);
 
-
-        String data = current.toJSONString();
         //when
 
         //then
