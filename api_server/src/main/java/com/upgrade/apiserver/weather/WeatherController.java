@@ -3,7 +3,6 @@ package com.upgrade.apiserver.weather;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,8 +15,6 @@ public class WeatherController {
 
     private WeatherService weatherService;
 
-    private WeatherEntity weather;
-
     @Autowired
     public WeatherController(WeatherService weatherService) {
         this.weatherService = weatherService;
@@ -29,7 +26,6 @@ public class WeatherController {
     }
 
     //37.549328709, 126.913624675 : 합정역 좌표
-    // TODO :: DB에 집어넣기
     @Scheduled(cron = "${SCHEDULES}", zone = "Asia/Seoul") // 매시간 실행
     @GetMapping("/api/weather")
     public String getWeatherDataToAPI() {
@@ -38,7 +34,7 @@ public class WeatherController {
     }
 
     @GetMapping("/api/weather-data")
-    public String getWeaterDataforPage() {
+    public String getWeatherDataForPage() {
         weatherService.getWeatherDataForPage();
         return "OK";
     }
