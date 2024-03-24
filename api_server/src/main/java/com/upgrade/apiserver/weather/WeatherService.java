@@ -11,9 +11,7 @@ public interface WeatherService {
      * @param lat : 예보 지점 X 좌표
      * @param lon : 예보 지점 y 좌표
      * */
-    void getWeatherDataToAPI(String lat, String lon);
-
-    void addWeatherDataInDB(@RequestBody String dto);
+    Boolean getWeatherDataToAPI(String lat, String lon);
 
     void getWeatherDataForPage();
 }

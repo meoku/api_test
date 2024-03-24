@@ -1,13 +1,15 @@
 package com.upgrade.apiserver.weather;
 
+import com.sun.tools.jconsole.JConsoleContext;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -23,13 +25,14 @@ import static java.net.http.HttpClient.*;
 public class WeatherServiceImpl implements WeatherService {
 
 
+    private final WeatherRepository weatherRepository;
+
     @Value("${WEATHER_API_KEY}")
     private String appId;
     String lang = "kr";
     String units = "metric";
     WeatherEntity entity = new WeatherEntity();
 
-    private final WeatherRepository weatherRepository;
 
     @Autowired
     public WeatherServiceImpl(WeatherRepository weatherRepository) {
@@ -38,7 +41,7 @@ public class WeatherServiceImpl implements WeatherService {
 
 
     @Override
-    public void getWeatherDataToAPI(String lat, String lon) {
+    public Boolean getWeatherDataToAPI(String lat, String lon) {
 
         final String url = MessageFormat.format("https://api.openweathermap.org/data/3.0/onecall?lat={0}&lon={1}&appid={2}&lang={3}&units={4}", lat, lon, appId, lang, units);
         HttpClient client = newHttpClient();
@@ -48,129 +51,84 @@ public class WeatherServiceImpl implements WeatherService {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response != null && response.statusCode() == 200) {
                 addWeatherDataInDB(response.body());
+                return true;
             } else {
                 log.error("API 서버와 통신이 되지 않습니다 현재 ResponseCode = {}", response != null ? response.statusCode() : "Unknown");
+                return false;
             }
         } catch (Exception e) {
-            log.error("API 서버와 통신 하는 동안 버그가 발생하였습니다.", e.toString());
+            log.error("DB에 저장하는 동안 버그가 발생하였습니다.", e.toString());
+            return false;
         }
 
     }
 
-    @Override
-//    public void addWeatherDataInDB(@RequestBody String jsonString) {
-//        JSONParser jsonParser = new JSONParser();
-//        LocalDate today = LocalDate.now();
-//        LocalTime noon = LocalTime.NOON;
-//        LocalDateTime dateTime = LocalDateTime.of(today, noon);
-//        ZoneId zoneId = ZoneId.of("Asia/Seoul");
-//        Object millis = dateTime.atZone(zoneId).toInstant().toEpochMilli() / 1000;
-//
-//        try {
-//            JSONObject jsonData = (JSONObject) jsonParser.parse(jsonString);
-//            JSONObject current = (JSONObject) jsonData.get("current");
-//            JSONObject weatherData = (JSONObject) jsonParser.parse(current.toJSONString());
-//            JSONArray weatherArray = (JSONArray) weatherData.get("weather");
-//            JSONObject weather = (JSONObject) weatherArray.get(0);
-//
-//
-//            Object description = weather.get("description");
-//            Object temp = current.get("temp");
-//            Object uvi = current.get("uvi");
-//
-//
-//            entity.setWeather((String) description);
-//            entity.setTemp((String) temp);
-//            entity.setUvi((Float) uvi);
-//
-//            //daily.dt>=date
-//            //daily.min minTemp
-//            //daily.max maxTemp
-//
-//            JSONObject dailyData = (JSONObject) jsonParser.parse(jsonData.toJSONString());
-//            JSONArray dailyArray = (JSONArray) dailyData.get("daily");
-//            JSONObject daily;
-//            JSONObject dailyTemp;
-//
-//
-//            Object dt = null;
-//            Object maxTemp = 0.0;
-//            Object minTemp = 0.0;
-//
-//            for (int i = 0; i < dailyArray.size(); i++) {
-//                daily = (JSONObject) dailyArray.get(i);
-//                dt = daily.get("dt");
-//                if (dt.equals(millis)) {
-//                    dailyTemp = (JSONObject) daily.get("temp");
-//                    minTemp = dailyTemp.get("min");
-//                    maxTemp = dailyTemp.get("max");
-//                }
-//            }
-//            entity.setMinTemp((Float) minTemp);
-//            entity.setMaxTemp((Float) maxTemp);
-//            entity.setDatetime((Long) dt);
-//
-//        } catch (ParseException e) {
-//            log.error("error log = {}", e.toString());
-//
-//        }
-//
-//    }
+    public void addWeatherDataInDB(@RequestBody String jsonString) {
+        JSONParser jsonParser = new JSONParser();
+        LocalDate today = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+        LocalTime noon = LocalTime.NOON;
+        LocalDateTime dateTime = LocalDateTime.of(today, noon);
+        ZoneId zoneId = ZoneId.of("Asia/Seoul");
+        Object millis = dateTime.atZone(zoneId).toInstant().toEpochMilli() / 1000;
+        // 동작시간을 저장하기 위한 형 변환
+        LocalDateTime workTime = LocalDateTime.of(today, currentTime);
 
-    public void addWeatherDataInDB(String jsonString) {
+
         try {
-            JSONObject jsonData = (JSONObject) new JSONParser().parse(jsonString);
+            JSONObject jsonData = (JSONObject) jsonParser.parse(jsonString);
             JSONObject current = (JSONObject) jsonData.get("current");
-            JSONArray weatherArray = (JSONArray) current.get("weather");
+            JSONObject weatherData = (JSONObject) jsonParser.parse(current.toJSONString());
+            JSONArray weatherArray = (JSONArray) weatherData.get("weather");
             JSONObject weather = (JSONObject) weatherArray.get(0);
 
-            WeatherEntity entity = new WeatherEntity();
-            entity.setWeather((String) weather.get("description"));
-            entity.setTemp(String.valueOf(current.get("temp")));
-            entity.setUvi(Float.parseFloat(String.valueOf(current.get("uvi"))));
+            Object description = weather.get("description");
+            Object temp = current.get("temp");
+            Object uvi = current.get("uvi");
 
-            JSONObject todayWeather = getWeatherForToday(jsonData);
-            if (todayWeather != null) {
-                entity.setMinTemp(Float.parseFloat(String.valueOf(todayWeather.get("min"))));
-                entity.setMaxTemp(Float.parseFloat(String.valueOf(todayWeather.get("max"))));
-                entity.setDatetime((Long) todayWeather.get("dt"));
+            JSONObject dailyData = (JSONObject) jsonParser.parse(jsonData.toJSONString());
+            JSONArray dailyArray = (JSONArray) dailyData.get("daily");
+            JSONObject daily;
+            JSONObject dailyTemp;
+
+            Object dt = 0;
+            Object maxTemp = 0.0;
+            Object minTemp = 0.0;
+
+            for (int i = 0; i < dailyArray.size(); i++) {
+                daily = (JSONObject) dailyArray.get(i);
+                dt = daily.get("dt");
+                if (dt.equals(millis)) {
+                    dailyTemp = (JSONObject) daily.get("temp");
+                    minTemp = dailyTemp.get("min");
+                    maxTemp = dailyTemp.get("max");
+                }
             }
 
-            // Save entity to database
-            // weatherRepository.save(entity);
+            entity.setWeather((String) description);
+            entity.setTemp(temp.toString());
+            entity.setUvi(uvi.toString());
+            entity.setMinTemp(minTemp.toString());
+            entity.setMaxTemp(maxTemp.toString());
+            entity.setDatetime(workTime);
+            weatherRepository.save(entity);
+
         } catch (ParseException e) {
-            log.error("Error parsing weather data JSON", e);
+            log.error("error log = {}", e.toString());
+
         }
+
     }
 
-    private JSONObject getWeatherForToday(JSONObject jsonData) {
-        JSONArray dailyArray = (JSONArray) jsonData.get("daily");
-        for (Object obj : dailyArray) {
-            JSONObject daily = (JSONObject) obj;
-            long dt = (long) daily.get("dt");
-            if (isToday(dt)) {
-                return (JSONObject) daily.get("temp");
-            }
-        }
-        return null;
-    }
 
-    private boolean isToday(long dt) {
-        LocalDateTime dateTime = LocalDateTime.ofInstant(Instant.ofEpochSecond(dt), ZoneId.of("Asia/Seoul"));
-        return dateTime.toLocalDate().equals(LocalDate.now());
-    }
-
+    //    날짜 & 시간을 PARAMETER로 받아서 출력
+    // 위치는 어디서 출력할것인지
     @Override
     public void getWeatherDataForPage() {
         try {
-            entity.getDatetime();
-            entity.getWeather();
-            entity.getUvi();
-            entity.getTemp();
-            entity.getMinTemp();
-            entity.getMaxTemp();
 
-            weatherRepository.save(entity);
+//            TODO 2 :: DB에 있는 값을 가져와서 데이터를 어떻게 뿌려줄건지 고민해 봐야할듯
+            System.out.println(weatherRepository.findAll());
 
         } catch (Exception e) {
             log.error("error log = {}", e.toString());
