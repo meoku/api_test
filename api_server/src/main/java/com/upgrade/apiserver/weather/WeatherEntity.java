@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+
+
 @Getter
 @Setter
 @ToString
@@ -13,12 +16,24 @@ import lombok.ToString;
 public class WeatherEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long datetime;
+    @Column(name = "id")
+    private Long id;
 
+    @Column(name = "datetime")
+    private LocalDateTime datetime;
+
+    @Column(name = "temp")
     private String temp;
-    private Float uvi;
+
+    @Column(name = "uvi")
+    private String uvi;
+
+    @Column(name = "weather")
     private String weather;
-    private Float minTemp; //일 최저기온
-    private Float maxTemp; //일 최대기온
-    private Integer visibility; // 가시거리(미세먼지 측정 데이터로 이용?)
+
+    @Column(name = "min_temp")
+    private String minTemp;
+
+    @Column(name = "max_temp")
+    private String maxTemp;
 }
