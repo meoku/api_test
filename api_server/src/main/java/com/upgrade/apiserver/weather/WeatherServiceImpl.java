@@ -135,7 +135,7 @@ public class WeatherServiceImpl implements WeatherService {
             LocalDateTime current = LocalDateTime.parse(currentTime, formatter);
 
             ObjectMapper objectMapper = new ObjectMapper();
-            Collection weatherData = weatherRepository.findClosestByDatetime(current);
+            Collection<WeatherEntity> weatherData = weatherRepository.findClosestByDatetime(current);
             if (weatherData.size() > 0) {
                 return objectMapper.registerModule(new JavaTimeModule()).writeValueAsString(weatherData);
             } else {
