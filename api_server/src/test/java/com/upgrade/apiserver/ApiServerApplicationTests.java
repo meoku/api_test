@@ -1,13 +1,21 @@
 package com.upgrade.apiserver;
 
 import com.upgrade.apiserver.weather.WeatherController;
+import com.upgrade.apiserver.weather.WeatherEntity;
+import com.upgrade.apiserver.weather.WeatherRepository;
 import com.upgrade.apiserver.weather.WeatherService;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.scheduling.annotation.Scheduled;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -19,6 +27,9 @@ class ApiServerApplicationTests {
 
     @Autowired
     private WeatherService weatherService;
+
+    @Autowired
+    private WeatherRepository weatherRepository;
 
     @DisplayName("Controller End-Point Test")
     @Test
@@ -89,5 +100,38 @@ class ApiServerApplicationTests {
 
     }
 
+    @DisplayName("Test WeatherRepository findClosestByDatetime")
+    @Test
+    void findClosestByDatetime() {
 
+        //given
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        // 현재 시간을 LocalDateTime 객체로 가져오기
+        LocalDateTime datetime = LocalDateTime.now();
+
+        // LocalDateTime 객체를 문자열로 변환
+        String stringDatetime = datetime.format(formatter);
+        System.out.println("Formatted DateTime: " + stringDatetime);
+
+        // 문자열을 LocalDateTime 객체로 역 변환
+        LocalDateTime parsedDateTime = LocalDateTime.parse(stringDatetime, formatter);
+        System.out.println("Parsed DateTime: " + parsedDateTime);
+
+        //when
+        List<WeatherEntity> weatherEntityList = weatherRepository.findClosestByDatetime(parsedDateTime);
+
+
+        //then
+        Assertions.assertNotNull(weatherEntityList);
+        System.out.println("시간 형태 데이터가 들어 갔을 때 : " + weatherEntityList);
+    }
+
+
+    @DisplayName("Test Scheduler")
+    @Test
+    @Scheduled(cron = "0 0 0/1 * * *", zone = "Asia/Seoul")
+    void schedulerTest() {
+
+    }
 }
