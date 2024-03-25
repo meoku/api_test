@@ -1,7 +1,6 @@
 package com.upgrade.apiserver.weather;
 
 
-
 public interface WeatherService {
 
     /*

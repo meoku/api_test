@@ -34,6 +34,9 @@ public class WeatherServiceImpl implements WeatherService {
     private String appId;
     String lang = "kr";
     String units = "metric";
+
+    String address = "서울시 강남구 남부순환로";
+
     WeatherEntity entity = new WeatherEntity();
 
 
@@ -74,9 +77,8 @@ public class WeatherServiceImpl implements WeatherService {
         LocalDateTime dateTime = LocalDateTime.of(today, noon);
         ZoneId zoneId = ZoneId.of("Asia/Seoul");
         Object millis = dateTime.atZone(zoneId).toInstant().toEpochMilli() / 1000;
-        // 동작시간을 저장하기 위한 형 변환
-        LocalDateTime workTime = LocalDateTime.of(today, currentTime);
 
+        LocalDateTime workTime = LocalDateTime.of(today, currentTime);
 
         try {
             JSONObject jsonData = (JSONObject) jsonParser.parse(jsonString);
@@ -116,6 +118,7 @@ public class WeatherServiceImpl implements WeatherService {
             entity.setMaxTemp(maxTemp.toString());
             entity.setDatetime(workTime);
             entity.setWeatherId(weatherId.toString());
+            entity.setAddress(address);
 
             weatherRepository.save(entity);
 
@@ -127,7 +130,6 @@ public class WeatherServiceImpl implements WeatherService {
     }
 
 
-    // TODO :: 지역 (좌표 -> 도로명 주소) 기능 추가하기
     @Override
     public String getWeatherDataForPage(String currentTime) {
         try {

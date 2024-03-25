@@ -44,6 +44,7 @@ class ApiServerApplicationTests {
         // given
         final String x = "37.549328709";
         final String y = "126.913624675";
+        final String address = "test location";
         // when
         Boolean testCase = weatherService.getWeatherDataToAPI(x, y);
 

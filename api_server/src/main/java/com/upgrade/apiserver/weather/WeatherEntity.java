@@ -39,4 +39,7 @@ public class WeatherEntity {
 
     @Column(name = "max_temp")
     private String maxTemp;
+
+    @Column(name = "address")
+    private String address;
 }
