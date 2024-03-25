@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,10 +29,21 @@ public class WeatherController {
     //37.549328709, 126.913624675 : 합정역 좌표
     //37.4866168, 127.0471096 : 대한민국 서울특별시 강남구 남부순환로 2748
     @Scheduled(cron = "${SCHEDULES}", zone = "Asia/Seoul") // 매시간 실행
-    @GetMapping("/api/weather")
-    public String getWeatherDataToAPI() {
+    public void getWeatherDataToAPI() {
         weatherService.getWeatherDataToAPI("37.4866168", "127.0471096");
-        return "OK";
+    }
+
+    // 수동 수집 링크
+    @GetMapping("/api/weather")
+    public ResponseEntity<String> getManualWeatherDataToAPI() {
+        Boolean result;
+        result = weatherService.getWeatherDataToAPI("37.4866168", "127.0471096");
+
+        if (Boolean.TRUE.equals(result)) {
+            return ResponseEntity.ok("OK");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not Found");
+        }
     }
 
     // 파라미터 값으로 현재 시간을 입력 받아야한다.
