@@ -131,12 +131,12 @@ public class WeatherServiceImpl implements WeatherService {
     @Override
     public String getWeatherDataForPage(String currentTime) {
         try {
-            DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             LocalDateTime current = LocalDateTime.parse(currentTime, formatter);
 
             ObjectMapper objectMapper = new ObjectMapper();
             Collection<WeatherEntity> weatherData = weatherRepository.findClosestByDatetime(current);
-            if (weatherData.size() > 0) {
+            if (!weatherData.isEmpty()) {
                 return objectMapper.registerModule(new JavaTimeModule()).writeValueAsString(weatherData);
             } else {
                 return "0";
