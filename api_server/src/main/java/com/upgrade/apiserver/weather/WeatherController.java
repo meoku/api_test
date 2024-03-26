@@ -28,12 +28,11 @@ public class WeatherController {
         return "main";
     }
 
-    // 왜 덮어 씌워지지?
     //37.549328709, 126.913624675 : 합정역 좌표
     //37.4866168, 127.0471096 : 대한민국 서울특별시 강남구 남부순환로 2748
     @Scheduled(cron = "${SCHEDULES}", zone = "Asia/Seoul") // 매시간 실행
     public void getWeatherDataToAPI() {
-        weatherService.getWeatherDataToAPI(lat, lon);
+        getManualWeatherDataToAPI();
     }
 
     // 수동 수집 링크
